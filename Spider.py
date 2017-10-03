@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
 # author = Chris Hong
-import re
-import sys
-import requests
+
 from Proxy import *
 
 reload(sys)
@@ -18,8 +16,6 @@ class SpiderTask:
         self.rs = rs
         self.params = params
         self.txt = txt
-
-        print self.params.list_range
 
     def http_spider(self, url, timeout=5000):
         proxies = random_proxy(http_ip=True)
