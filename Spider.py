@@ -12,21 +12,30 @@ logging.basicConfig(level=logging.INFO)
 
 
 class SpiderTask:
-    def __init__(self, rs, params, txt=None):
+    def __init__(self, rs, params, txt=None, encoder='utf-8', use_proxy=False):
         self.rs = rs
         self.params = params
         self.txt = txt
+        self.encoder = encoder
+        self.use_proxy = use_proxy
 
     def http_spider(self, url, timeout=5000):
-        proxies = random_proxy(http_ip=True)
+
         headers = random_headers()
+
         try:
-            resp = self.rs.get(url, proxies=proxies, headers=headers, timeout=timeout)
+            if self.use_proxy:
+                proxies = random_proxy(http_ip=True)
+                print 'start url: ' + url, 'proxy: ', proxies
+                resp = self.rs.get(url, proxies=proxies, headers=headers, timeout=timeout)
+            else:
+                resp = self.rs.get(url, headers=headers, timeout=timeout)
+
             if resp.status_code != 200:
                 logging.error("Error: " + resp.text + "StatusCode: " + str(resp.status_code))
                 return 'error'
             else:
-                return resp.text
+                return resp.text, resp.encoding
         except Exception, e:
             print "CRANIAL ERROR: ", e.message
 
@@ -41,8 +50,12 @@ class SpiderTask:
         all_url = self.generate_task_url()
 
         for i in all_url:
+
             # get http respond text
-            text = self.http_spider(i)
+            text, encode = self.http_spider(i)
+
+            # encode
+            text = text.encode(encode).decode(self.encoder, 'ignore')
 
             # clean data from respond text
             for info in self.clean(text):
