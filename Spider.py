@@ -20,16 +20,15 @@ class SpiderTask:
         self.use_proxy = use_proxy
 
     def http_spider(self, url, timeout=5000):
-
         headers = random_headers()
-
         try:
             if self.use_proxy:
                 proxies = random_proxy(http_ip=True)
-                print 'start url: ' + url, 'proxy: ', proxies
                 resp = self.rs.get(url, proxies=proxies, headers=headers, timeout=timeout)
             else:
                 resp = self.rs.get(url, headers=headers, timeout=timeout)
+
+            print 'start url: ' + url
 
             if resp.status_code != 200:
                 logging.error("Error: " + resp.text + "StatusCode: " + str(resp.status_code))
