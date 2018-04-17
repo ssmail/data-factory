@@ -4,16 +4,12 @@
 import sys
 import json
 import random
-import logging
 from getproxy import GetProxy
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 PROXY_FILE = "proxy"
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def random_headers():
@@ -24,28 +20,28 @@ def random_headers():
     return random.choice(header)
 
 
-def proxy_center(http_ip=False, https_ip=False):
+def proxy_center(https_ip=True):
     proxys = []
 
     with open(PROXY_FILE, 'r') as f_proxy:
         proxy_list = f_proxy.readlines()
 
     for proxy in proxy_list:
-        try:
-            info = s2json(proxy)
-            if info['type'] == 'http' and http_ip:
+        info = s2json(proxy)
+
+        if https_ip:
+            if info['type'] == 'https':
+                proxys.append((info['type'], info['host'], info['port']))
+        else:
+            if info['type'] == 'http':
                 proxys.append((info['type'], info['host'], info['port']))
 
-            if info['type'] == 'https' and https_ip:
-                proxys.append((info['type'], info['host'], info['port']))
-        except Exception, e:
-            logging.error("get proxy ip error: ", e.message)
-            pass
     return proxys
 
 
-def random_proxy(http_ip=True, https_ip=False):
-    proxies = random.choice(proxy_center(http_ip=http_ip, https_ip=https_ip))
+def random_proxy(https_ip=False):
+    proxyss = proxy_center(https_ip)
+    proxies = random.choice(proxyss)
     return {proxies[0]: '{http}://{ip}:{port}'.format(http=proxies[0],
                                                       ip=proxies[1],
                                                       port=proxies[2])}

@@ -7,9 +7,6 @@ from Proxy import *
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
 
 class SpiderTask:
     def __init__(self, rs, params, txt=None, encoder='utf-8', use_proxy=False):
@@ -31,7 +28,6 @@ class SpiderTask:
             print 'start url: ' + url
 
             if resp.status_code != 200:
-                logging.error("Error: " + resp.text + "StatusCode: " + str(resp.status_code))
                 return 'error'
             else:
                 return resp.text, resp.encoding
